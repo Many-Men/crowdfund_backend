@@ -4,7 +4,7 @@ import (
 	"github.com/Many-Men/crowdfund_backend/config"
 	"github.com/Many-Men/crowdfund_backend/internal/delivery"
 	_middleware "github.com/Many-Men/crowdfund_backend/middleware"
-	"github.com/jmoiron/sqlx"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	_ "github.com/Many-Men/crowdfund_backend/docs"
 	"github.com/labstack/echo/v4"
@@ -26,7 +26,7 @@ import (
 // @host petstore.swagger.io
 // @externalDocs.description  OpenAPI 2.0
 // @BasePath /
-func RunHTTPServer(cfg *config.Config, db *sqlx.DB) {
+func RunHTTPServer(cfg *config.Config, db *mongo.Database) {
 	e, log := echo.New(), logrus.New()
 
 	log.Out = os.Stdout

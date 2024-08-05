@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"github.com/Many-Men/crowdfund_backend/config"
+	_errors "github.com/Many-Men/crowdfund_backend/errors"
 	"github.com/Many-Men/crowdfund_backend/internal/infrastructure/entity"
 	infrastructureInterface "github.com/Many-Men/crowdfund_backend/internal/service/interface"
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,7 +27,7 @@ func NewDonationRepositoryImpl(db *mongo.Database) infrastructureInterface.Donat
 func (r *DonationRepositoryImpl) CreateDonation(ctx context.Context, donation entity.Donation) (primitive.ObjectID, error) {
 	result, err := r.collection.InsertOne(ctx, donation)
 	if err != nil {
-		return primitive.NilObjectID, err
+		return primitive.NilObjectID, &_errors.InternalServerError{Message: "Failed to create donation"}
 	}
 	return result.InsertedID.(primitive.ObjectID), nil
 }
@@ -34,7 +36,10 @@ func (r *DonationRepositoryImpl) GetDonationByID(ctx context.Context, id primiti
 	var donation entity.Donation
 	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&donation)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, &_errors.NotFoundError{Message: "Donation not found"}
+		}
+		return nil, &_errors.InternalServerError{Message: "Failed to retrieve donation"}
 	}
 	return &donation, nil
 }
@@ -43,10 +48,10 @@ func (r *DonationRepositoryImpl) GetDonationsByCampaign(ctx context.Context, cam
 	var donations []entity.Donation
 	cursor, err := r.collection.Find(ctx, bson.M{"campaign": campaignID})
 	if err != nil {
-		return nil, err
+		return nil, &_errors.InternalServerError{Message: "Failed to retrieve donations for campaign"}
 	}
 	if err = cursor.All(ctx, &donations); err != nil {
-		return nil, err
+		return nil, &_errors.InternalServerError{Message: "Failed to process donations data"}
 	}
 	return donations, nil
 }
@@ -55,15 +60,21 @@ func (r *DonationRepositoryImpl) GetDonationsByDonor(ctx context.Context, donorI
 	var donations []entity.Donation
 	cursor, err := r.collection.Find(ctx, bson.M{"donor": donorID})
 	if err != nil {
-		return nil, err
+		return nil, &_errors.InternalServerError{Message: "Failed to retrieve donations for donor"}
 	}
 	if err = cursor.All(ctx, &donations); err != nil {
-		return nil, err
+		return nil, &_errors.InternalServerError{Message: "Failed to process donations data"}
 	}
 	return donations, nil
 }
 
 func (r *DonationRepositoryImpl) DeleteDonation(ctx context.Context, id primitive.ObjectID) error {
-	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
-	return err
+	result, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
+	if err != nil {
+		return &_errors.InternalServerError{Message: "Failed to delete donation"}
+	}
+	if result.DeletedCount == 0 {
+		return &_errors.NotFoundError{Message: "Donation not found"}
+	}
+	return nil
 }
