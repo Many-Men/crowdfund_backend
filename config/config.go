@@ -2,8 +2,8 @@ package config
 
 import (
 	"github.com/caarlos0/env/v6"
-	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
+	"sync"
 )
 
 type EnvMode string
@@ -14,18 +14,18 @@ const (
 )
 
 type Config struct {
-	Server   Server
-	Postgres Postgres
-	API      API
+	Server  Server
+	MongoDB MongoDB
+	API     API
 }
 
 type (
-	Postgres struct {
+	MongoDB struct {
 		Host     string `env:"DB_HOST"`
 		Port     string `env:"DB_PORT"`
 		User     string `env:"DB_USER"`
 		Password string `env:"DB_PASSWORD"`
-		Name     string `env:"DB_NAME"`
+		Database string `env:"DB_NAME"`
 	}
 
 	Server struct {
@@ -37,15 +37,17 @@ type (
 	}
 )
 
-var instance Config
+var (
+	instance Config
+	once     sync.Once
+)
 
 func Load() *Config {
-	if err := godotenv.Load("../../.env"); err != nil {
-		panic("Error loading .env file: " + err.Error())
-	}
+	once.Do(func() {
+		if err := env.Parse(&instance); err != nil {
+			panic(err)
+		}
+	})
 
-	if err := env.Parse(&instance); err != nil {
-		panic(err)
-	}
 	return &instance
 }

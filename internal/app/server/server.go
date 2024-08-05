@@ -1,22 +1,22 @@
 package server
 
 import (
-	"github.com/XT3RM1NAT0R/time-tracker/config"
-	"github.com/XT3RM1NAT0R/time-tracker/internal/delivery"
+	"github.com/Many-Men/crowdfund_backend/config"
+	"github.com/Many-Men/crowdfund_backend/internal/delivery"
+	_middleware "github.com/Many-Men/crowdfund_backend/middleware"
 	"github.com/jmoiron/sqlx"
 
-	_ "github.com/XT3RM1NAT0R/time-tracker/docs"
+	_ "github.com/Many-Men/crowdfund_backend/docs"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
-	echoSwagger "github.com/swaggo/echo-swagger"
 	"os"
 )
 
 // RunHTTPServer
-// @title Time Tracker
+// @title ...
 // @version 1.0
-// @description This is the backend server for the test assignment.
+// @description ...
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.url http://www.swagger.io/support
@@ -27,21 +27,17 @@ import (
 // @externalDocs.description  OpenAPI 2.0
 // @BasePath /
 func RunHTTPServer(cfg *config.Config, db *sqlx.DB) {
-	e := echo.New()
+	e, log := echo.New(), logrus.New()
 
-	logger := logrus.New()
-	logger.Out = os.Stdout
-
+	log.Out = os.Stdout
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "${time_rfc3339_nano} [${status}] ${method} ${uri} (${latency_human})\n",
-		Output: logger.Out,
+		Output: log.Out,
 	}))
 	e.Use(middleware.CORS())
+	e.Use(_middleware.ErrorHandlingMiddleware)
 
-	delivery.RegisterRoutes(e, cfg, db)
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
-	//http://localhost:4200/swagger/index.html что бы увидеть доку
-
+	delivery.RegisterRoutes(e, db)
 	if err := e.Start(cfg.Server.Port); err != nil {
 		panic(err)
 	}
