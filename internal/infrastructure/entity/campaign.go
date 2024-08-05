@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
@@ -16,12 +15,13 @@ type Campaign struct {
 	CreatorID       primitive.ObjectID `bson:"creator"`
 	CreatorUsername string             `bson:"creator_username"`
 	LikeCount       int                `bson:"like_count"`
+	Content         []string           `bson:"content"`
 	CreatedAt       time.Time          `bson:"created_at"`
 }
 
-func NewCampaign(title, description, creatorUsername string, goal float64, creatorID primitive.ObjectID) *Campaign {
+func NewCampaign(title, description, creatorUsername, uuid string, goal float64, creatorID primitive.ObjectID, content []string) *Campaign {
 	return &Campaign{
-		CampaignID:      uuid.New().String(),
+		CampaignID:      uuid,
 		Title:           title,
 		Description:     description,
 		Goal:            goal,
@@ -29,6 +29,7 @@ func NewCampaign(title, description, creatorUsername string, goal float64, creat
 		CreatorID:       creatorID,
 		CreatorUsername: creatorUsername,
 		LikeCount:       0,
+		Content:         content,
 		CreatedAt:       time.Now(),
 	}
 }

@@ -7,28 +7,41 @@ import (
 	_interface "github.com/Many-Men/crowdfund_backend/internal/domain/interface"
 	"github.com/Many-Men/crowdfund_backend/internal/infrastructure/entity"
 	infrastructureInterface "github.com/Many-Men/crowdfund_backend/internal/service/interface"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CampaignServiceImpl struct {
 	campaignRepository infrastructureInterface.CampaignRepository
+	fileService        _interface.FileService
 	config             *config.Config
 }
 
-func NewCampaignServiceImpl(campaignRepo infrastructureInterface.CampaignRepository) _interface.CampaignService {
+func NewCampaignServiceImpl(campaignRepo infrastructureInterface.CampaignRepository, fileService _interface.FileService) _interface.CampaignService {
 	return &CampaignServiceImpl{
 		campaignRepository: campaignRepo,
+		fileService:        fileService,
 		config:             config.Load(),
 	}
 }
 
-func (s *CampaignServiceImpl) CreateCampaign(title, description, username string, goal float64) error {
+func (s *CampaignServiceImpl) CreateCampaign(title, description, username string, goal float64, pictures [][]byte) error {
 	user, err := s.campaignRepository.GetUserByUsername(context.Background(), username)
 	if err != nil {
 		return err
 	}
-	campaign := entity.NewCampaign(title, description, username, goal, user.ID)
 
+	id := uuid.New().String()
+	content := make([]string, len(pictures))
+
+	for i, p := range pictures {
+		fn := id + "_" + string(rune(i))
+		content = append(content, fn)
+
+		go s.fileService.SaveFile(fn, p)
+	}
+
+	campaign := entity.NewCampaign(title, description, username, id, goal, user.ID, content)
 	if _, err := s.campaignRepository.CreateCampaign(context.Background(), *campaign); err != nil {
 		return err
 	}

@@ -24,10 +24,11 @@ type DonationRequest struct {
 }
 
 type CampaignRequest struct {
-	Title         string  `json:"title"`
-	Description   string  `json:"description"`
-	GoalAmount    float64 `json:"goal_amount"`
-	CurrentAmount float64 `json:"current_amount"`
+	Title         string   `json:"title"`
+	Description   string   `json:"description"`
+	GoalAmount    float64  `json:"goal_amount"`
+	CurrentAmount float64  `json:"current_amount"`
+	Pictures      [][]byte `json:"pictures"`
 }
 
 // Responses

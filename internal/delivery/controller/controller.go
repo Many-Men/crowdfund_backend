@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/Many-Men/crowdfund_backend/config"
+	_errors "github.com/Many-Men/crowdfund_backend/errors"
 	"github.com/Many-Men/crowdfund_backend/internal/delivery/model"
 	_interface "github.com/Many-Men/crowdfund_backend/internal/domain/interface"
 	"github.com/labstack/echo/v4"
@@ -169,11 +170,11 @@ func (ac *AppController) CreateUser(c echo.Context) error {
 func (ac *AppController) CreateCampaign(c echo.Context) error {
 	var request model.CampaignRequest
 	if err := c.Bind(&request); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Error: err.Error()})
+		return &_errors.BadRequestError{Message: "invalid request"}
 	}
 
 	username := c.Request().Context().Value("username").(string)
-	if err := ac.campaignService.CreateCampaign(request.Title, request.Description, username, request.GoalAmount); err != nil {
+	if err := ac.campaignService.CreateCampaign(request.Title, request.Description, username, request.GoalAmount, request.Pictures); err != nil {
 		return err
 	}
 

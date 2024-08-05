@@ -2,8 +2,6 @@ package _interface
 
 import (
 	"github.com/Many-Men/crowdfund_backend/internal/delivery/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
 )
 
 type UserService interface {
@@ -24,22 +22,17 @@ type DonationService interface {
 }
 
 type CampaignService interface {
-	CreateCampaign(title, description, username string, goal float64) error
+	CreateCampaign(title, description, username string, goal float64, pictures [][]byte) error
 	//GetCampaignByID(id primitive.ObjectID) (*model.CampaignResponse, error)
 	GetAllCampaigns() ([]model.CampaignResponse, error)
 	//UpdateCampaignAmount(id primitive.ObjectID, amount float64) error
 	//DeleteCampaign(id primitive.ObjectID) error
 }
 
-type Campaign struct {
-	ID              primitive.ObjectID `bson:"_id,omitempty"`
-	CampaignID      string             `bson:"campaign_id"`
-	Title           string             `bson:"title"`
-	Description     string             `bson:"description"`
-	Goal            float64            `bson:"goal"`
-	CurrentAmount   float64            `bson:"current_amount"`
-	CreatorID       primitive.ObjectID `bson:"creator"`
-	CreatorUsername string             `bson:"creator_username"`
-	LikeCount       int                `bson:"like_count"`
-	CreatedAt       time.Time          `bson:"created_at"`
+type FileService interface {
+	SaveFile(filename string, content []byte) error
+	LoadFile(filename string) ([]byte, error)
+	UpdateFileName(oldName, newName string) error
+	UpdateFile(newFileBytes []byte, fileName string) error
+	DeleteFile(filename string) error
 }
