@@ -78,3 +78,15 @@ func (r *DonationRepositoryImpl) DeleteDonation(ctx context.Context, id primitiv
 	}
 	return nil
 }
+
+func (r *DonationRepositoryImpl) GetUserByUsername(ctx context.Context, username string) (*entity.User, error) {
+	var user entity.User
+	err := r.collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, &_errors.NotFoundError{Message: "User not found"}
+		}
+		return nil, &_errors.InternalServerError{Message: "Failed to retrieve user"}
+	}
+	return &user, nil
+}

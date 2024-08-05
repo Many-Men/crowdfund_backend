@@ -12,3 +12,12 @@ type Donation struct {
 	Donor    primitive.ObjectID `bson:"donor"`
 	Date     time.Time          `bson:"date"`
 }
+
+func NewDonation(amount float64, campaign, donor primitive.ObjectID) *Donation {
+	return &Donation{
+		Amount:   amount,
+		Campaign: campaign,
+		Donor:    donor,
+		Date:     time.Now(),
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"github.com/Many-Men/crowdfund_backend/internal/delivery/controller"
 	"github.com/Many-Men/crowdfund_backend/internal/infrastructure/repository"
 	"github.com/Many-Men/crowdfund_backend/internal/service"
+	_middleware "github.com/Many-Men/crowdfund_backend/middleware"
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,9 +35,9 @@ func RegisterRoutes(e *echo.Echo, db *mongo.Database) {
 	e.GET("/donations/donor/:donor_id", c.GetDonationsByDonor)
 	e.DELETE("/donation/:id", c.DeleteDonation)
 
-	e.POST("/campaign", c.CreateCampaign)
+	e.POST("/campaign", c.CreateCampaign, _middleware.ValidateAccessTokenMiddleware())
 	e.GET("/campaign/:id", c.GetCampaignByID)
-	e.GET("/campaigns", c.GetAllCampaigns)
+	e.GET("/campaigns", c.GetAllCampaigns, _middleware.ValidateAccessTokenMiddleware())
 	e.PUT("/campaign/:id/amount", c.UpdateCampaignAmount)
 	e.DELETE("/campaign/:id", c.DeleteCampaign)
 }

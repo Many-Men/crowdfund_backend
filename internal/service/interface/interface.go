@@ -10,6 +10,7 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, user entity.User) (primitive.ObjectID, error)
 	GetUserByID(ctx context.Context, id primitive.ObjectID) (*entity.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*entity.User, error)
 	UpdateUserBalance(ctx context.Context, id primitive.ObjectID, balance float64) error
 	DeleteUser(ctx context.Context, id primitive.ObjectID) error
 	ListUsers(ctx context.Context) ([]entity.User, error)
@@ -29,4 +30,5 @@ type CampaignRepository interface {
 	GetAllCampaigns(ctx context.Context) ([]entity.Campaign, error)
 	UpdateCampaignAmount(ctx context.Context, id primitive.ObjectID, amount float64) error
 	DeleteCampaign(ctx context.Context, id primitive.ObjectID) error
+	GetUserByUsername(ctx context.Context, username string) (*entity.User, error)
 }

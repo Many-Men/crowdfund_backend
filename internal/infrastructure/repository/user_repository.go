@@ -56,6 +56,18 @@ func (r *UserRepositoryImpl) GetUserByEmail(ctx context.Context, email string) (
 	return &user, nil
 }
 
+func (r *UserRepositoryImpl) GetUserByUsername(ctx context.Context, username string) (*entity.User, error) {
+	var user entity.User
+	err := r.collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, &_errors.NotFoundError{Message: "User not found"}
+		}
+		return nil, &_errors.InternalServerError{Message: "Failed to retrieve user"}
+	}
+	return &user, nil
+}
+
 func (r *UserRepositoryImpl) UpdateUserBalance(ctx context.Context, id primitive.ObjectID, balance float64) error {
 	result, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"balance": balance}})
 	if err != nil {

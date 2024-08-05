@@ -21,8 +21,14 @@ func NewUserServiceImpl(userRepo infrastructureInterface.UserRepository) _interf
 	}
 }
 
-func (s *UserServiceImpl) CreateUser(user entity.User) (primitive.ObjectID, error) {
-	return s.userRepository.CreateUser(context.Background(), user)
+func (s *UserServiceImpl) CreateUser(username string) error {
+	user := entity.NewUser(username, "", "", 10000)
+
+	if _, err := s.userRepository.CreateUser(context.Background(), *user); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *UserServiceImpl) GetUserByID(id primitive.ObjectID) (*entity.User, error) {

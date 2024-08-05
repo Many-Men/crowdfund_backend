@@ -10,6 +10,7 @@ import (
 type UserRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Username string `json:"username"`
 }
 
 type UserUpdateBalanceRequest struct {
@@ -39,7 +40,7 @@ type SuccessResponse struct {
 	Message string `json:"message"`
 }
 
-type UserProfileResponse struct {
+type UserResponse struct {
 	Email     string    `json:"email"`
 	FullName  string    `json:"full_name"`
 	Logo      []byte    `json:"logo"`
@@ -55,10 +56,12 @@ type DonationResponse struct {
 }
 
 type CampaignResponse struct {
-	ID            primitive.ObjectID `json:"id"`
-	Title         string             `json:"title"`
-	Description   string             `json:"description"`
-	GoalAmount    float64            `json:"goal_amount"`
-	CurrentAmount float64            `json:"current_amount"`
-	CreatedAt     time.Time          `json:"created_at"`
+	CampaignID      string    `json:"campaign_id"`
+	Title           string    `json:"title"`
+	Description     string    `json:"description"`
+	Goal            float64   `json:"goal"`
+	CurrentAmount   float64   `json:"current_amount"`
+	CreatorUsername string    `json:"creator"`
+	LikeCount       int       `json:"like_count"`
+	CreatedAt       time.Time `json:"created_at"`
 }

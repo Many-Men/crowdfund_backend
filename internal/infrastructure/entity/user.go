@@ -9,3 +9,12 @@ type User struct {
 	Password string             `bson:"password"`
 	Balance  float64            `bson:"balance"`
 }
+
+func NewUser(username, email, password string, balance float64) *User {
+	return &User{
+		Username: username,
+		Email:    email,
+		Password: password,
+		Balance:  balance,
+	}
+}
